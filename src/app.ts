@@ -15,7 +15,7 @@ const app: Express = express();
 app.use(express.json());
 app.use("/movies", movies);
 
-app.use("*", notFound);
+app.use("*", notFound.error);
 app.use(ErrorHandler.handleError as ErrorRequestHandler);
 
 export default app;
