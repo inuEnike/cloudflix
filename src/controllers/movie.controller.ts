@@ -5,8 +5,41 @@ import { MovieService } from "../services/movie.service";
 
 export class CMovie {
   static async createMovie(req: Request, res: Response, next: NextFunction) {
+    const {
+      title,
+      year,
+      rated,
+      released,
+      runtime,
+      genre,
+      director,
+      writers,
+      actors,
+      plot,
+      languages,
+      country,
+      awards,
+      type,
+    } = req.body;
     try {
-      const movie = await MovieService.createMovie(req.body);
+      const file = req.file?.path;
+      const movie = await MovieService.createMovie({
+        title,
+        year,
+        rated,
+        released,
+        runtime,
+        genre,
+        director,
+        writers,
+        actors,
+        plot,
+        languages,
+        country,
+        awards,
+        type,
+        posterPath: file,
+      });
       res.json({ movie });
     } catch (e) {
       next(e);
