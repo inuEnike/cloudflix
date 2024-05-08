@@ -15,3 +15,8 @@ export interface IMovie {
   posterPath: string;
   type: string[];
 }
+
+export interface GetAllMoviesOptions {
+  limit: number;
+  skip: number;
+}

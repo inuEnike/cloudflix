@@ -1,3 +1,4 @@
+import { GetAllMoviesOptions } from "../interface/movie.interface";
 import { Movie } from "../models/movie.model";
 
 export class MovieService {
@@ -9,11 +10,16 @@ export class MovieService {
       throw error;
     }
   }
-  static async getAllMovies() {
+  static async getAllMovies({ limit, skip }: GetAllMoviesOptions) {
     try {
-      const movie = await Movie.find({});
+      if (limit < 0) {
+        const movies = await Movie.find();
+        return movies;
+      }
+      const movie = await Movie.find().skip(skip).limit(limit);
+      console.log({ movie });
       return movie;
-    } catch (error) {
+    } catch (error: any) {
       throw error;
     }
   }

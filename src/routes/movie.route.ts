@@ -8,6 +8,7 @@ const router = express.Router();
 const upload = multer({ storage });
 router
   .post("/", validator.validate, upload.single("file"), CMovie.createMovie)
-  .get("/", CMovie.getAllMovie);
+  .get("/", CMovie.getAllMovie)
+  .get("/:id", CMovie.getSingleMovie);
 
 export default router;
