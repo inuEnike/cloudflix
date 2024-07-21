@@ -1,26 +1,21 @@
-import { GetAllMoviesOptions } from "../interface/movie.interface";
-import { Movie } from "../models/movie.model";
+import axios from "axios";
+import { ENV_DATA } from "../utils/envData";
 
-export class MovieService {
-  static async createMovie(movieData: any) {
-    try {
-      const movie = await Movie.create(movieData);
-      return movie;
-    } catch (error) {
-      throw error;
-    }
+export const fetchFromTMDB = async (uri: string) => {
+  try {
+    const options = {
+      headers: {
+        accept: "application/json",
+        Authorization: `Bearer ${ENV_DATA.TMDB_KEY}`,
+      },
+    };
+    const { data } = await axios.get(
+      `https://api.themoviedb.org${uri}`,
+      options
+    );
+    return data;
+  } catch (error: any) {
+    console.log("Error fetching data", error.message);
+    throw new Error(error.message);
   }
-  static async getAllMovies({ limit, skip }: GetAllMoviesOptions) {
-    try {
-      if (limit < 0) {
-        const movies = await Movie.find();
-        return movies;
-      }
-      const movie = await Movie.find().skip(skip).limit(limit);
-      console.log({ movie });
-      return movie;
-    } catch (error: any) {
-      throw error;
-    }
-  }
-}
+};

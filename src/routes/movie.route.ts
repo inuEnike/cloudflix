@@ -1,14 +1,15 @@
-import { CMovie } from "./../controllers/movie.controller";
 import express, { Express, Request, Response } from "express";
-import { validator } from "../middleware/validators/movie.validator";
-import multer from "multer";
-import { storage } from "../utils/cloudinary";
+import { Movies } from "../controllers/movie.controller";
+import { Auth } from "../middleware/auth.middleware";
+
 const router = express.Router();
 
-const upload = multer({ storage });
 router
-  .post("/", validator.validate, upload.single("file"), CMovie.createMovie)
-  .get("/", CMovie.getAllMovie)
-  .get("/:id", CMovie.getSingleMovie);
-
+  .get("/trending-movies", Auth.middleware, Movies.trendingMovies)
+  .get("/trending-movie", Auth.middleware, Movies.trendingMovie)
+  .get("/search/:query", Auth.middleware, Movies.search)
+  .get("/:id/movie", Auth.middleware, Movies.singleMovie)
+  .get("/:id/movie-trailer", Auth.middleware, Movies.movieTrailer)
+  .get("/:id/similar-movie", Auth.middleware, Movies.similarMovies)
+  .get("/:id/recomendations", Auth.middleware, Movies.recomendations);
 export default router;

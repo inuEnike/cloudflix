@@ -1,85 +1,76 @@
-import { NextFunction, Request, Response, query } from "express";
+import { NextFunction, Request, Response } from "express";
+import { fetchFromTMDB } from "../services/movie.service";
 
-import { Movie } from "../models/movie.model";
-import { MovieService } from "../services/movie.service";
-import { GetAllMoviesOptions } from "../interface/movie.interface";
-
-const options: GetAllMoviesOptions = {
-  limit: 10,
-  skip: 0,
-};
-
-export class CMovie {
-  static async createMovie(req: Request, res: Response, next: NextFunction) {
-    const {
-      title,
-      year,
-      rated,
-      released,
-      runtime,
-      genre,
-      director,
-      writers,
-      actors,
-      plot,
-      languages,
-      country,
-      awards,
-      type,
-    } = req.body;
+export class Movies {
+  static async trendingMovies(req: Request, res: Response, next: NextFunction) {
     try {
-      const file = req.file?.path;
-      const movie = await MovieService.createMovie({
-        title,
-        year,
-        rated,
-        released,
-        runtime,
-        genre,
-        director,
-        writers,
-        actors,
-        plot,
-        languages,
-        country,
-        awards,
-        type,
-        posterPath: file,
-      });
-      res.json({ movie });
-    } catch (e) {
-      next(e);
+      const data = await fetchFromTMDB("/3/trending/movie/day?language=en-US");
+      res.status(200).json({ movies: data });
+    } catch (error) {
+      next(error);
     }
   }
-  static async getAllMovie(req: Request, res: Response, next: NextFunction) {
+  static async trendingMovie(req: Request, res: Response, next: NextFunction) {
     try {
-      const page: number = parseInt(req.query.page as string, 10) || 1; // Default page to 1 if not provided
-      const limit = 5; //data that are going to be fetched
-      const skip = (page - 1) * limit;
+      const data = await fetchFromTMDB("/3/trending/movie/day?language=en-US");
 
-      let movies;
-      if (isNaN(page)) {
-        // Fetch all movies if page is not provided or NaN
-        movies = await MovieService.getAllMovies(options);
-      } else {
-        // Fetch movies with pagination
-        movies = await MovieService.getAllMovies({ limit, skip });
-      }
-
-      res.json({ movies, totalResults: movies.length });
-    } catch (e) {
-      next(e);
+      const randomIndex = Math.floor(Math.random() * data.results.length);
+      const fetchedSingle = data.results[randomIndex];
+      res.status(200).json({ content: fetchedSingle });
+    } catch (error) {
+      next(error);
     }
   }
 
-  static async getSingleMovie(req: Request, res: Response, next: NextFunction) {
+  static async movieTrailer(req: Request, res: Response, next: NextFunction) {
+    const { id } = req.params;
     try {
-      const { id } = req.params;
-      const movie = await Movie.findById(id);
-      if (!movie) {
-        return res.json({ msg: `No movie with the id of ${id} found` });
-      }
-      res.json({ movie });
+      const data = await fetchFromTMDB(`/3/movie/${id}/videos?language=en-US`);
+      res.status(200).json({ movie: data });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async singleMovie(req: Request, res: Response, next: NextFunction) {
+    const { id } = req.params;
+    try {
+      const data = await fetchFromTMDB(`/3/movie/${id}?language=en-US`);
+      res.status(200).json({ movie: data });
+    } catch (error) {
+      next(error);
+    }
+  }
+  static async similarMovies(req: Request, res: Response, next: NextFunction) {
+    const { id } = req.params;
+    try {
+      const data = await fetchFromTMDB(
+        `/3/movie/${id}/similar?language=en-US&page=1S`
+      );
+      res.status(200).json({ movie: data });
+    } catch (error) {
+      next(error);
+    }
+  }
+  static async recomendations(req: Request, res: Response, next: NextFunction) {
+    const { id } = req.params;
+    try {
+      const data = await fetchFromTMDB(
+        `/3/movie/${id}/recommendations?language=en-US`
+      );
+      res.status(200).json({ movie: data });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async search(req: Request, res: Response, next: NextFunction) {
+    const { query } = req.params;
+    try {
+      const data = await fetchFromTMDB(
+        `/3/search/movie?query=${query}&include_adult=true&language=en-US`
+      );
+      res.status(200).json({ movie: data });
     } catch (error) {
       next(error);
     }

@@ -1,8 +1,9 @@
 import app from "./app";
-import { config } from "./config/config";
-import { connectDb } from "./utils/db";
 
-app.listen(config.PORT, () => {
+import { connectDb } from "./utils/db";
+import { ENV_DATA } from "./utils/envData";
+
+app.listen(ENV_DATA.PORT, () => {
   connectDb();
-  console.log(`Server Kickstarted on port ${config.PORT}`);
+  console.log(`Server Kickstarted on port ${ENV_DATA.PORT}`);
 });
